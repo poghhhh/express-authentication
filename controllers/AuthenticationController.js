@@ -33,10 +33,68 @@ exports.login = async (req, res) => {
       }
     );
 
+    await user.update({ refreshToken });
     // Consider including user data or additional information in the access token payload
     res.json({ accessToken, refreshToken });
   } catch (error) {
     console.error('Error finding user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
+// Refresh token controller
+exports.refreshToken = (req, res) => {
+  const refreshToken = req.body.refreshToken;
+  const user = User.findOne((x) => x.refreshToken === refreshToken);
+  if (!user) return res.status(403).json({ message: 'Invalid token' });
+
+  // Generate new refresh token and new access token
+  const newAccessToken = jwt.sign(
+    { id: user.id },
+    process.env.SECRET_ACCESS_TOKEN_KEY,
+    { expiresIn: '1m' }
+  );
+  const newRefreshToken = jwt.sign(
+    { id: user.id },
+    process.env.SECRET_REFRESH_TOKEN_KEY,
+    { expiresIn: '30m' }
+  );
+
+  // Update refresh token in database with the new refresh token generated
+  user.refreshToken = newRefreshToken;
+
+  // Consider saving the updated user object to the database
+
+  res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
+};
+
+// Register controller
+exports.register = async (req, res) => {
+  const { username, email, password } = req.body;
+
+  try {
+    // Check if the user already exists
+    const existingUser = await User.findOne({ where: { email } });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+    // Hash the password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Create a new user in the database
+    const newUser = await User.create({
+      username,
+      email,
+      password: hashedPassword,
+      refreshToken: null, // You can set a default value for refreshToken if necessary
+    });
+
+    // You can generate and return an access token here if needed
+
+    res.status(201).json({ message: 'User registered successfully' });
+  } catch (error) {
+    console.error('Error registering user:', error);
     res.status(500).json({ message: 'Internal server error' });
   }
 };

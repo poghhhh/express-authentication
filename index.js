@@ -1,13 +1,13 @@
 const express = require('express');
 const routes = require('./routes/routes');
 const { swaggerUi, specs } = require('./swaggerConfig');
-const { handleAccessToken, jsonParser } = require('./middleware');
+const { verifyToken, jsonParser } = require('./middleware');
 
 const app = express();
 
 // Middleware
 app.use(jsonParser); // Use the JSON body parser middleware
-app.use(handleAccessToken); // Use the handleAccessToken middleware
+app.use(verifyToken); // Use the verifyToken middleware
 
 // Routes
 app.use('/', routes);

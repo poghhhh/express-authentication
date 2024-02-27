@@ -6,12 +6,16 @@ require('dotenv').config();
 const jsonParser = bodyParser.json();
 
 // Middleware for verifying the access token
-const handleAccessToken = (req, res, next) => {
+const verifyToken = (req, res, next) => {
   // Extract the access token from the Authorization header
   const authHeader = req.headers['authorization'];
 
   // Skip token verification for specific routes
-  if (req.path.startsWith('/api-docs') || req.path === '/api/auth/login') {
+  if (
+    req.path.startsWith('/api-docs') ||
+    req.path === '/api/auth/login' ||
+    req.path === '/api/auth/register'
+  ) {
     return next(); // Skip token verification for /api-docs route
   }
 
@@ -25,7 +29,11 @@ const handleAccessToken = (req, res, next) => {
       (err, decoded) => {
         if (err) {
           // Token verification failed
-          return res.status(401).json({ message: 'Invalid access token' });
+          if (err.name == 'TokenExpiredError') {
+            return res.status(401).json({ message: err.message });
+          } else {
+            return res.status(401).json({ message: err.message });
+          }
         } else {
           // Token is valid, attach the decoded payload to the request object
           req.user = decoded;
@@ -39,4 +47,4 @@ const handleAccessToken = (req, res, next) => {
   }
 };
 
-module.exports = { handleAccessToken, jsonParser };
+module.exports = { verifyToken, jsonParser };

@@ -7,7 +7,11 @@
 
 const express = require('express');
 const router = express.Router();
-const { login, logout } = require('../controllers/AuthenticationController');
+const {
+  login,
+  refreshToken,
+  register,
+} = require('../controllers/AuthenticationController');
 const { getAllUsers } = require('../controllers/UsersController');
 
 /**
@@ -47,6 +51,35 @@ router.post('/api/auth/login', login);
 
 /**
  * @swagger
+ * /api/auth/register:
+ *   post:
+ *     summary: Register user
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               username:
+ *                 type: string
+ *               email:
+ *                 type: string
+ *               password:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully registered
+ *       '409':
+ *         description: User already exists
+ *       '500':
+ *         description: Internal server error
+ */
+router.post('/api/auth/register', register);
+
+/**
+ * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users
@@ -60,5 +93,28 @@ router.post('/api/auth/login', login);
  *         description: Internal server error
  */
 router.get('/api/users', getAllUsers);
+
+/**
+ * @swagger
+ * /api/auth/refresh-token:
+ *   post:
+ *     summary: Refresh access token
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               refreshToken:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Successfully refreshed token
+ *       '403':
+ *         description: Invalid token
+ */
+router.post('api/auth/refresh-token', refreshToken);
 
 module.exports = router;
