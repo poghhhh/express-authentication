@@ -1,5 +1,5 @@
 const express = require('express');
-const routes = require('./routes/routes'); 
+const routes = require('./routes/routes');
 const { swaggerUi, specs } = require('./swaggerConfig');
 const { handleAccessToken, jsonParser } = require('./middleware');
 
@@ -18,5 +18,5 @@ app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
 // Start server
 const PORT = process.env.PORT || 3111;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+  console.log(`Server is running on port ${PORT}`);
 });

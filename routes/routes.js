@@ -47,20 +47,6 @@ router.post('/api/auth/login', login);
 
 /**
  * @swagger
- * /api/auth/logout:
- *   post:
- *     summary: Logout user
- *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
- *     responses:
- *       '200':
- *         description: Successfully logged out
- */
-router.post('/api/auth/logout', logout);
-
-/**
- * @swagger
  * /api/users:
  *   get:
  *     summary: Get all users
@@ -73,7 +59,6 @@ router.post('/api/auth/logout', logout);
  *       '500':
  *         description: Internal server error
  */
-router.get('/api/users',  getAllUsers);
-
+router.get('/api/users', getAllUsers);
 
 module.exports = router;
