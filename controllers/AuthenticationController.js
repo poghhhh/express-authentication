@@ -43,14 +43,15 @@ exports.login = async (req, res) => {
 };
 
 // Refresh token controller
-exports.refreshToken = (req, res) => {
+exports.refreshToken = async (req, res) => {
   const refreshToken = req.body.refreshToken;
-  const user = User.findOne((x) => x.refreshToken === refreshToken);
+  const user = await User.findOne({ where: { refreshToken: refreshToken } });
+
   if (!user) return res.status(403).json({ message: 'Invalid token' });
 
   // Generate new refresh token and new access token
   const newAccessToken = jwt.sign(
-    { id: user.id },
+    { username: user.username, id: user.id },
     process.env.SECRET_ACCESS_TOKEN_KEY,
     { expiresIn: '1m' }
   );
@@ -62,6 +63,7 @@ exports.refreshToken = (req, res) => {
 
   // Update refresh token in database with the new refresh token generated
   user.refreshToken = newRefreshToken;
+  await user.save();
 
   // Consider saving the updated user object to the database
 
