@@ -13,6 +13,9 @@ const {
   register,
 } = require('../controllers/AuthenticationController');
 const { getAllUsers } = require('../controllers/UsersController');
+const {
+  arrangeCleaningDuties,
+} = require('../controllers/CleanningDutyController');
 
 /**
  * @swagger
@@ -116,5 +119,21 @@ router.get('/api/users', getAllUsers);
  *         description: Invalid token
  */
 router.post('/api/auth/refresh-token', refreshToken);
+
+/**
+ * @swagger
+ * /api/cleaning-duties/arrange:
+ *   post:
+ *     summary: Arrange cleaning duties
+ *     tags: [Cleaning Duties]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Cleaning duties arranged successfully
+ *       '500':
+ *         description: Internal server error
+ */
+router.post('/api/cleaning-duties/arrange', arrangeCleaningDuties);
 
 module.exports = router;

@@ -1,6 +1,8 @@
 const { User } = require('../models');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const dto = require('lodash');
+const tokenResponseModel = require('../DTOs/authenticationDTOs/tokenResponseDTO');
 require('dotenv').config();
 
 // Login controller
@@ -23,19 +25,25 @@ exports.login = async (req, res) => {
     const accessToken = jwt.sign(
       { username: user.username, id: user.id },
       process.env.SECRET_ACCESS_TOKEN_KEY,
-      { expiresIn: '1m' }
+      { expiresIn: '1d' }
     );
     const refreshToken = jwt.sign(
       { id: user.id },
       process.env.SECRET_REFRESH_TOKEN_KEY,
       {
-        expiresIn: '30m',
+        expiresIn: '7d',
       }
     );
 
     await user.update({ refreshToken });
-    // Consider including user data or additional information in the access token payload
-    res.json({ accessToken, refreshToken });
+    // Use the token response model to structure the response
+    const tokenResponse = dto.pick(
+      { accessToken, refreshToken },
+      Object.values(tokenResponseModel)
+    );
+
+    // Return the token response
+    res.json(tokenResponse);
   } catch (error) {
     console.error('Error finding user:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -53,12 +61,12 @@ exports.refreshToken = async (req, res) => {
   const newAccessToken = jwt.sign(
     { username: user.username, id: user.id },
     process.env.SECRET_ACCESS_TOKEN_KEY,
-    { expiresIn: '1m' }
+    { expiresIn: '1d' }
   );
   const newRefreshToken = jwt.sign(
     { id: user.id },
     process.env.SECRET_REFRESH_TOKEN_KEY,
-    { expiresIn: '30m' }
+    { expiresIn: '7d' }
   );
 
   // Update refresh token in database with the new refresh token generated
