@@ -115,6 +115,6 @@ router.get('/api/users', getAllUsers);
  *       '403':
  *         description: Invalid token
  */
-router.post('api/auth/refresh-token', refreshToken);
+router.post('/api/auth/refresh-token', refreshToken);
 
 module.exports = router;
