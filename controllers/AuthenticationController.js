@@ -3,6 +3,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const dto = require('lodash');
 const tokenResponseModel = require('../DTOs/authenticationDTOs/tokenResponseDTO');
+const registerSuccessResponseDTO = require('../DTOs/authenticationDTOs/registerSuccessResponseDTO');
 require('dotenv').config();
 
 // Login controller
@@ -75,7 +76,13 @@ exports.refreshToken = async (req, res) => {
 
   // Consider saving the updated user object to the database
 
-  res.json({ accessToken: newAccessToken, refreshToken: newRefreshToken });
+  const tokenResponse = dto.pick(
+    { newAccessToken, newRefreshToken },
+    Object.values(tokenResponseModel)
+  );
+
+  // Return the token response
+  res.json(tokenResponse);
 };
 
 // Register controller
@@ -97,12 +104,19 @@ exports.register = async (req, res) => {
       username,
       email,
       password: hashedPassword,
-      refreshToken: null, // You can set a default value for refreshToken if necessary
+      refreshToken: null,
     });
+    console.log(newUser);
 
-    // You can generate and return an access token here if needed
+    const registerSuccessResponse = dto.pick(
+      newUser,
+      Object.values(registerSuccessResponseDTO)
+    );
 
-    res.status(201).json({ message: 'User registered successfully' });
+    res.status(201).json({
+      message: 'User registered successfully',
+      data: registerSuccessResponse,
+    });
   } catch (error) {
     console.error('Error registering user:', error);
     res.status(500).json({ message: 'Internal server error' });

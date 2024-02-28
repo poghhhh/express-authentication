@@ -15,6 +15,7 @@ const {
 const { getAllUsers } = require('../controllers/UsersController');
 const {
   arrangeCleaningDuties,
+  getCleaningDuties,
 } = require('../controllers/CleanningDutyController');
 
 /**
@@ -135,5 +136,34 @@ router.post('/api/auth/refresh-token', refreshToken);
  *         description: Internal server error
  */
 router.post('/api/cleaning-duties/arrange', arrangeCleaningDuties);
+
+/**
+ * @swagger
+ * /api/cleaning-duties/{year}/{month}:
+ *   get:
+ *     summary: Get cleaning duties
+ *     tags: [Cleaning Duties]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: year
+ *         required: true
+ *         type: string
+ *         format: date
+ *       - in: path
+ *         name: month
+ *         required: true
+ *         type: string
+ *         format: date
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved cleaning duties
+ *       '400':
+ *         description: Invalid month or year
+ *       '500':
+ *         description: Internal server error
+ */
+router.get('/api/cleaning-duties/:year/:month', getCleaningDuties);
 
 module.exports = router;
