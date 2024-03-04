@@ -120,16 +120,3 @@ exports.getCleaningDuties = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
-
-function getTotalCleaningDays(startDate, endDate) {
-  let totalCleaningDays = 0;
-
-  for (let day = startDate; day <= endDate; day.setDate(day.getDate() + 1)) {
-    // Skip Saturdays and Sundays
-    if (day.getDay() !== 0 && day.getDay() !== 6) {
-      totalCleaningDays++;
-    }
-  }
-
-  return totalCleaningDays;
-}
