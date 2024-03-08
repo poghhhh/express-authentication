@@ -87,7 +87,7 @@ exports.refreshToken = async (req, res) => {
 
 // Register controller
 exports.register = async (req, res) => {
-  const { username, email, password } = req.body;
+  const { username, name, email, password } = req.body;
 
   try {
     // Check if the user already exists
@@ -102,11 +102,14 @@ exports.register = async (req, res) => {
     // Create a new user in the database
     const newUser = await User.create({
       username,
+      name,
       email,
       password: hashedPassword,
-      refreshToken: null,
+      refresh_token: null,
+      avatar_url:
+        'https://www.testhouse.net/wp-content/uploads/2021/11/default-avatar.jpg',
+      isAdmin: false,
     });
-    console.log(newUser);
 
     const registerSuccessResponse = dto.pick(
       newUser,

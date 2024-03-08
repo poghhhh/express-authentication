@@ -12,13 +12,19 @@ module.exports = {
       username: {
         type: Sequelize.STRING,
       },
+      name: {
+        type: Sequelize.STRING,
+      },
       email: {
+        type: Sequelize.STRING,
+      },
+      avatar_url: {
         type: Sequelize.STRING,
       },
       password: {
         type: Sequelize.STRING,
       },
-      refreshToken: {
+      refresh_token: {
         type: Sequelize.STRING,
       },
       createdAt: {
@@ -28,6 +34,9 @@ module.exports = {
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,
+      },
+      is_admin: {
+        type: Sequelize.BOOLEAN,
       },
     });
   },

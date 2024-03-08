@@ -19,3 +19,46 @@ exports.getAllUsers = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+exports.getUserById = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const user = await User.findByPk(id);
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    const filteredUser = dto.pick(user, Object.values(userResponseModel));
+
+    res.json(filteredUser);
+  } catch (error) {
+    console.error('Error fetching user:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+
+  exports.updateInformation = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { name, email, avatarUrl } = req.body;
+
+      const user = await User.findByPk(id);
+
+      if (!user) {
+        return res.status(404).json({ message: 'User not found' });
+      }
+
+      user.name = name;
+      user.email = email;
+      user.avatarUrl = avatarUrl;
+
+      await user.save();
+
+      const filteredUser = dto.pick(user, Object.values(userResponseModel));
+
+      res.json(filteredUser);
+    } catch (error) {
+      console.error('Error updating user:', error);
+      res.status(500).json({ message: 'Internal server error' });
+    }
+  };
+};

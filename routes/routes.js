@@ -12,7 +12,7 @@ const {
   refreshToken,
   register,
 } = require('../controllers/AuthenticationController');
-const { getAllUsers } = require('../controllers/UsersController');
+const { getAllUsers, getUserById } = require('../controllers/UsersController');
 const {
   arrangeCleaningDuties,
   getCleaningDuties,
@@ -70,6 +70,8 @@ router.post('/api/auth/login', login);
  *                 type: string
  *               email:
  *                 type: string
+ *               name:
+ *                 type: string
  *               password:
  *                 type: string
  *     responses:
@@ -97,6 +99,30 @@ router.post('/api/auth/register', register);
  *         description: Internal server error
  */
 router.get('/api/users', getAllUsers);
+
+/**
+ * @swagger
+ * /api/users/{id}:
+ *   get:
+ *     summary: Get user by ID
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: id
+ *         required: true
+ *         type: string
+ *         description: User ID
+ *     responses:
+ *       '200':
+ *         description: Successfully retrieved user
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
+router.get('/api/users/:id', getUserById);
 
 /**
  * @swagger

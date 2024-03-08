@@ -10,20 +10,28 @@ module.exports = {
       'Users',
       [
         {
+          username: 'admin',
+          name: 'Admin',
+          email: 'admin@example.com',
+          password: hashedPassword,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          refresh_token: null,
+          avatar_url:
+            'https://www.testhouse.net/wp-content/uploads/2021/11/default-avatar.jpg',
+          isAdmin: true,
+        },
+        {
           username: 'user1',
+          name: 'Nguyễn Văn Chơi',
           email: 'user1@example.com',
           password: hashedPassword,
           createdAt: new Date(),
           updatedAt: new Date(),
-          refreshToken: null,
-        },
-        {
-          username: 'user2',
-          email: 'user2@example.com',
-          password: hashedPassword,
-          createdAt: new Date(),
-          updatedAt: new Date(),
-          refreshToken: null,
+          refresh_token: null,
+          avatar_url:
+            'https://www.testhouse.net/wp-content/uploads/2021/11/default-avatar.jpg',
+          isAdmin: false,
         },
       ],
       {}
