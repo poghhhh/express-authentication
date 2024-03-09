@@ -6,7 +6,7 @@ require('dotenv').config();
 const jsonParser = bodyParser.json();
 
 // Middleware for verifying the access token
-const verifyToken = (req, res, next) => {
+const verifyToken = (app) => (req, res, next) => {
   // Extract the access token from the Authorization header
   const authHeader = req.headers['authorization'];
 
@@ -37,6 +37,7 @@ const verifyToken = (req, res, next) => {
         } else {
           // Token is valid, attach the decoded payload to the request object
           req.user = decoded;
+          app.locals.current_user = decoded;
           next();
         }
       }

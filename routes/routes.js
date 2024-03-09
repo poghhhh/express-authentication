@@ -12,7 +12,11 @@ const {
   refreshToken,
   register,
 } = require('../controllers/AuthenticationController');
-const { getAllUsers, getUser } = require('../controllers/UsersController');
+const {
+  getAllUsers,
+  getUser,
+  updateAvatar,
+} = require('../controllers/UsersController');
 const {
   arrangeCleaningDuties,
   getCleaningDuties,

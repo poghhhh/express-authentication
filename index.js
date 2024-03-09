@@ -1,6 +1,7 @@
 const express = require('express');
 const routes = require('./routes/routes');
 const { swaggerUi, specs } = require('./swaggerConfig');
+const minioClient = require('./services/minio');
 const { verifyToken, jsonParser } = require('./middleware');
 
 const app = express();
@@ -14,6 +15,19 @@ app.use('/', routes);
 
 // Serve Swagger UI
 app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
+// Create a bucket and list all buckets
+(async () => {
+  console.log(`Creating Bucket: Cleanning Duty`);
+  await minioClient
+    .makeBucket('cleanning-duty', 'us-east-1')
+    .then(() => {
+      console.log(`Bucket 'cleanning-duty' created successfully.`);
+    })
+    .catch((e) => {
+      console.log(`Error while creating bucket 'cleanning-duty': ${e.message}`);
+    });
+})();
 
 // Start server
 const PORT = process.env.PORT || 3111;
