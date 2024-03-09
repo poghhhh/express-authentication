@@ -131,6 +131,36 @@ router.get('/api/users/:id', getUser);
 
 /**
  * @swagger
+ * /api/users/update-avatar:
+ *   post:
+ *     summary: Update user's avatar
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: base64
+ *     responses:
+ *       '200':
+ *         description: Avatar updated successfully
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '404':
+ *         description: User not found
+ *       '500':
+ *         description: Internal server error
+ */
+router.post('/api/users/update-avatar', updateAvatar);
+
+/**
+ * @swagger
  * /api/auth/refresh-token:
  *   post:
  *     summary: Refresh access token

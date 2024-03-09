@@ -3,7 +3,7 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Middleware for parsing JSON bodies
-const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json({ limit: '10mb' });
 
 // Middleware for verifying the access token
 const verifyToken = (app) => (req, res, next) => {

@@ -8,7 +8,7 @@ const app = express();
 
 // Middleware
 app.use(jsonParser); // Use the JSON body parser middleware
-app.use(verifyToken); // Use the verifyToken middleware
+app.use(verifyToken(app)); // Use the verifyToken middleware
 
 // Routes
 app.use('/', routes);

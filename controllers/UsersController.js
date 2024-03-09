@@ -61,22 +61,48 @@ exports.updateUser = async (req, res) => {
 };
 
 exports.updateAvatar = async (req, res) => {
-  const base64Data = req.body.avatar;
   try {
+    // Check if avatar data exists in the request body
+    if (!req.body || !req.body.avatar) {
+      return res.status(400).json({ message: 'Avatar data is missing' });
+    }
+
+    const base64Data = req.body.avatar;
     var bucketName = 'cleanning-duty';
     // Decode the base64 string into binary data
-    var imageData = Buffer.from(base64Data, 'base64');
-
+    const imageData = new Buffer.from(
+      base64Data.replace(/^data:image\/\w+;base64,/, ''),
+      'base64'
+    );
+    const type = base64Data.split(';')[0].split('/')[1];
+    const objectName =
+      req.app.locals.current_user.username + Date.now() + '.jpg';
+    var metaData = {
+      ContentEncoding: 'base64',
+      ContentType: `image/${type}`,
+    };
     // Upload the temporary file to MinIO
-    minioClient.fPutObject(
+    minioClient.putObject(
       bucketName,
-      app.locals.current_user.username + Date.now() + '.jpg',
+      objectName,
       imageData,
-      function (err, etag) {
+      metaData,
+      async function (err, etag) {
         if (err) {
-          return console.log(err);
+          console.error('Error uploading file:', err);
+          return res.status(500).json({ message: 'Failed to upload file' });
         }
         console.log('File uploaded successfully.');
+        const avatar_url = `http://${process.env.ENDPOINT}:${process.env.MINIO_PORT}/cleanning-duty/${objectName}`;
+
+        // Update the user's avatar_url in the database
+        const user = await User.findByPk(req.app.locals.current_user.id);
+        user.update({ avatar_url: avatar_url });
+
+        res.status(200).json({
+          message: 'Avatar updated successfully',
+          data: { avatar_url: avatar_url },
+        });
       }
     );
   } catch (error) {
