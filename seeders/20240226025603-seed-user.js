@@ -10,20 +10,30 @@ module.exports = {
       'Users',
       [
         {
-          username: 'user1',
-          email: 'user1@example.com',
+          username: 'admin',
+          email: 'admin@example.com',
+          name: 'Admin',
+          avatar_url:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwdRIXfjIoZZgo4WdJ4nvjWbYIP0Oe6zGDn10RveeYkg&s',
           password: hashedPassword,
+          date_of_birth: null,
           createdAt: new Date(),
           updatedAt: new Date(),
-          refreshToken: null,
+          refresh_token: null,
+          is_admin: true,
         },
         {
-          username: 'user2',
-          email: 'user2@example.com',
+          username: 'user1',
+          email: 'user1@example.com',
+          name: 'User1',
+          avatar_url:
+            'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwdRIXfjIoZZgo4WdJ4nvjWbYIP0Oe6zGDn10RveeYkg&s',
           password: hashedPassword,
+          date_of_birth: '1/1/1990',
           createdAt: new Date(),
           updatedAt: new Date(),
-          refreshToken: null,
+          refresh_token: null,
+          is_admin: false,
         },
       ],
       {}
