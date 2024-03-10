@@ -30,6 +30,9 @@ module.exports = {
       avatar_url: {
         type: Sequelize.STRING,
       },
+      phone_number: {
+        type: Sequelize.STRING,
+      },
       is_admin: {
         type: Sequelize.BOOLEAN,
       },

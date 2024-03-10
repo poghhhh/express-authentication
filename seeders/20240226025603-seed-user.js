@@ -20,6 +20,7 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           refresh_token: null,
+          phone_number: null,
           is_admin: true,
         },
         {
@@ -33,6 +34,7 @@ module.exports = {
           createdAt: new Date(),
           updatedAt: new Date(),
           refresh_token: null,
+          phone_number: '0289371231',
           is_admin: false,
         },
       ],

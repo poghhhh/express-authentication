@@ -16,6 +16,7 @@ const {
   getAllUsers,
   getUser,
   updateAvatar,
+  updateUser,
 } = require('../controllers/UsersController');
 const {
   arrangeCleaningDuties,
@@ -132,7 +133,7 @@ router.get('/api/users/:id', getUser);
 /**
  * @swagger
  * /api/users/update-avatar:
- *   post:
+ *   put:
  *     summary: Update user's avatar
  *     tags: [Users]
  *     security:
@@ -148,8 +149,8 @@ router.get('/api/users/:id', getUser);
  *                 type: string
  *                 format: base64
  *     responses:
- *       '200':
- *         description: Avatar updated successfully
+ *       '204':
+ *         description: User information updated successfully
  *       '400':
  *         description: Bad request. Invalid input data.
  *       '404':
@@ -157,7 +158,41 @@ router.get('/api/users/:id', getUser);
  *       '500':
  *         description: Internal server error
  */
-router.post('/api/users/update-avatar', updateAvatar);
+router.put('/api/users/update-avatar', updateAvatar);
+
+/**
+ * @swagger
+ * /api/users:
+ *   put:
+ *     summary: Update user information
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               date_of_birth:
+ *                 type: string
+ *                 format: date
+ *               phone_number:
+ *                 type: string
+ *     responses:
+ *       '204':
+ *         description: User information updated successfully
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
+router.put('/api/users', updateUser);
 
 /**
  * @swagger

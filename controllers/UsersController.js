@@ -32,7 +32,10 @@ exports.getUser = async (req, res) => {
     const filteredUser = dto.pick(user, Object.values(userResponseModel));
 
     // Return the filteredUser object in the response
-    res.json(filteredUser);
+    res.json({
+      message: 'Get user information successfully',
+      data: filteredUser,
+    });
   } catch (error) {
     console.error('Error finding user:', error);
     res.status(500).json({ message: 'Internal server error' });
@@ -41,11 +44,8 @@ exports.getUser = async (req, res) => {
 
 // Controller to update a user
 exports.updateUser = async (req, res) => {
-  const { username, email, name, date_of_birth } = req.body;
   try {
-    const user = await User.findByPk(req.params.id);
-
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const user = await User.findByPk(req.app.locals.current_user.id);
 
     await user.update(req.body);
 
@@ -53,7 +53,7 @@ exports.updateUser = async (req, res) => {
     const filteredUser = dto.pick(user, Object.values(userResponseModel));
 
     // Return the filteredUser object in the response
-    res.json(filteredUser);
+    res.json({ message: 'User updated successfully', data: filteredUser });
   } catch (error) {
     console.error('Error updating user:', error);
     res.status(500).json({ message: 'Internal server error' });
