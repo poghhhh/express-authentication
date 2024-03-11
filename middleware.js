@@ -3,10 +3,10 @@ const jwt = require('jsonwebtoken');
 require('dotenv').config();
 
 // Middleware for parsing JSON bodies
-const jsonParser = bodyParser.json();
+const jsonParser = bodyParser.json({ limit: '10mb' });
 
 // Middleware for verifying the access token
-const verifyToken = (req, res, next) => {
+const verifyToken = (app) => (req, res, next) => {
   // Extract the access token from the Authorization header
   const authHeader = req.headers['authorization'];
 
@@ -37,6 +37,7 @@ const verifyToken = (req, res, next) => {
         } else {
           // Token is valid, attach the decoded payload to the request object
           req.user = decoded;
+          app.locals.current_user = decoded;
           next();
         }
       }

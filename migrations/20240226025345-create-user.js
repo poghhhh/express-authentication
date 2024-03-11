@@ -27,6 +27,18 @@ module.exports = {
       refresh_token: {
         type: Sequelize.STRING,
       },
+      date_of_birth: {
+        type: Sequelize.STRING,
+      },
+      avatar_url: {
+        type: Sequelize.STRING,
+      },
+      phone_number: {
+        type: Sequelize.STRING,
+      },
+      is_admin: {
+        type: Sequelize.BOOLEAN,
+      },
       createdAt: {
         allowNull: false,
         type: Sequelize.DATE,

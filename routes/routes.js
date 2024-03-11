@@ -12,7 +12,12 @@ const {
   refreshToken,
   register,
 } = require('../controllers/AuthenticationController');
-const { getAllUsers, getUserById } = require('../controllers/UsersController');
+const {
+  getAllUsers,
+  getUser,
+  updateAvatar,
+  updateUser,
+} = require('../controllers/UsersController');
 const {
   arrangeCleaningDuties,
   getCleaningDuties,
@@ -68,6 +73,10 @@ router.post('/api/auth/login', login);
  *             properties:
  *               username:
  *                 type: string
+ *               name:
+ *                 type: string
+ *               date_of_birth:
+ *                 type: string
  *               email:
  *                 type: string
  *               name:
@@ -103,26 +112,89 @@ router.get('/api/users', getAllUsers);
 /**
  * @swagger
  * /api/users/{id}:
- *   get:
- *     summary: Get user by ID
+ *  get:
+ *   summary: Get a single user
+ *   tags: [Users]
+ *   security:
+ *    - bearerAuth: []
+ *   parameters:
+ *    - in: path
+ *      name: id
+ *      required: true
+ *      type: integer
+ *   responses:
+ *    '200':
+ *     description: Successfully retrieved user
+ *    '404':
+ *     description: User not found
+ *    '500':
+ *     description: Internal server error
+ */
+router.get('/api/users/:id', getUser);
+
+/**
+ * @swagger
+ * /api/users/update-avatar:
+ *   put:
+ *     summary: Update user's avatar
  *     tags: [Users]
  *     security:
  *       - bearerAuth: []
- *     parameters:
- *       - in: path
- *         name: id
- *         required: true
- *         type: string
- *         description: User ID
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               avatar:
+ *                 type: string
+ *                 format: base64
  *     responses:
- *       '200':
- *         description: Successfully retrieved user
+ *       '204':
+ *         description: User information updated successfully
+ *       '400':
+ *         description: Bad request. Invalid input data.
  *       '404':
  *         description: User not found
  *       '500':
  *         description: Internal server error
  */
-router.get('/api/users/:id', getUserById);
+router.put('/api/users/update-avatar', updateAvatar);
+
+/**
+ * @swagger
+ * /api/users:
+ *   put:
+ *     summary: Update user information
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               email:
+ *                 type: string
+ *               name:
+ *                 type: string
+ *               date_of_birth:
+ *                 type: string
+ *                 format: date
+ *               phone_number:
+ *                 type: string
+ *     responses:
+ *       '204':
+ *         description: User information updated successfully
+ *       '400':
+ *         description: Bad request. Invalid input data.
+ *       '500':
+ *         description: Internal server error
+ */
+router.put('/api/users', updateUser);
 
 /**
  * @swagger

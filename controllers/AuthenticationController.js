@@ -24,7 +24,12 @@ exports.login = async (req, res) => {
 
     // Create access token with a shorter expiration time (e.g., 15 minutes)
     const accessToken = jwt.sign(
-      { username: user.username, id: user.id },
+      {
+        username: user.username,
+        id: user.id,
+        isAdmin: user.is_admin,
+        name: user.name,
+      },
       process.env.SECRET_ACCESS_TOKEN_KEY,
       { expiresIn: '1d' }
     );
@@ -87,7 +92,8 @@ exports.refreshToken = async (req, res) => {
 
 // Register controller
 exports.register = async (req, res) => {
-  const { username, name, email, password } = req.body;
+  const { username, email, password, name, date_of_birth, phone_number } =
+    req.body;
 
   try {
     // Check if the user already exists
@@ -104,11 +110,13 @@ exports.register = async (req, res) => {
       username,
       name,
       email,
+      date_of_birth,
       password: hashedPassword,
       refresh_token: null,
       avatar_url:
-        'https://www.testhouse.net/wp-content/uploads/2021/11/default-avatar.jpg',
-      isAdmin: false,
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRwdRIXfjIoZZgo4WdJ4nvjWbYIP0Oe6zGDn10RveeYkg&s',
+      phone_number,
+      is_admin: false,
     });
 
     const registerSuccessResponse = dto.pick(
