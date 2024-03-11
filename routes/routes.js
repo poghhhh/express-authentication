@@ -79,8 +79,6 @@ router.post('/api/auth/login', login);
  *                 type: string
  *               email:
  *                 type: string
- *               name:
- *                 type: string
  *               password:
  *                 type: string
  *     responses:
