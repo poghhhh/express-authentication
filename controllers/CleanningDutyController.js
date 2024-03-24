@@ -40,9 +40,10 @@ exports.arrangeCleaningDuties = async (req, res) => {
 
     // Start a transaction
     await sequelize.transaction(async (t) => {
-      // Iterate over the days until the end of the month and assign cleaning duties
+      // Array to hold cleaning duties for the current and next month
       const cleaningDuties = [];
-      // Reset the cleaning day to the first day of the week
+
+      // Iterate over the days until the end of the month and assign cleaning duties
       const cleaningDay = new Date(cleaningDate);
 
       for (let i = 1; i <= totalDays; i++) {
@@ -73,13 +74,25 @@ exports.arrangeCleaningDuties = async (req, res) => {
         cleaningDay.setDate(cleaningDay.getDate() + 1);
       }
 
-      // Bulk insert cleaning duty records
-      await CleaningDuty.bulkCreate(cleaningDuties, { transaction: t });
+      // Move remaining users to the next month if any
+      if (clonedUsers.length > 0) {
+        const nextMonth = new Date(cleaningDate);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        nextMonth.setDate(1);
 
-      // Move to the next month
-      cleaningDate.setMonth(cleaningDate.getMonth() + 1);
-      // Reset the cleaning date to the first day of the month
-      cleaningDate.setDate(1);
+        clonedUsers.forEach((user) => {
+          cleaningDuties.push({
+            cleaner_id: user.id,
+            assign_date: nextMonth,
+            cleaning_date: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+        });
+      }
+
+      // Bulk insert all cleaning duty records
+      await CleaningDuty.bulkCreate(cleaningDuties, { transaction: t });
     });
 
     res
@@ -106,7 +119,7 @@ exports.getCleaningDuties = async (req, res) => {
       include: {
         model: User,
         as: 'cleaner',
-        attributes: ['id', 'email'],
+        attributes: ['id', 'email', 'avatar_url'],
       },
     });
 
