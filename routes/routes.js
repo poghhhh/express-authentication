@@ -23,6 +23,13 @@ const {
   getCleaningDuties,
 } = require('../controllers/CleanningDutyController');
 
+const {
+  savingTokenDevice,
+  deleteTokenDevice,
+} = require('../controllers/DevicesController');
+
+const { sendNotification } = require('../controllers/NotificationController');
+
 /**
  * @swagger
  * securityDefinitions:
@@ -261,5 +268,71 @@ router.post('/api/cleaning-duties/arrange', arrangeCleaningDuties);
  *         description: Internal server error
  */
 router.get('/api/cleaning-duties/:year/:month', getCleaningDuties);
+
+/**
+ * @swagger
+ * /api/devices:
+ *   post:
+ *     summary: Save device token
+ *     tags: [Devices]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               deviceToken:
+ *                 type: string
+ *     responses:
+ *       '201':
+ *         description: Device token saved
+ *       '500':
+ *         description: Internal server error
+ */
+router.post('/api/devices', savingTokenDevice);
+
+/**
+ * @swagger
+ * /api/devices:
+ *   delete:
+ *     summary: Delete device token
+ *     tags: [Devices]
+ *     security:
+ *       - bearerAuth: []
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               deviceToken:
+ *                 type: string
+ *     responses:
+ *       '200':
+ *         description: Device token deleted
+ *       '500':
+ *         description: Internal server error
+ */
+router.delete('/api/devices', deleteTokenDevice);
+
+/**
+ * @swagger
+ * /api/notifications:
+ *   post:
+ *     summary: Send notification
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Notification sent successfully
+ *       '500':
+ *         description: Internal server error
+ */
+router.post('/api/notifications', sendNotification);
 
 module.exports = router;

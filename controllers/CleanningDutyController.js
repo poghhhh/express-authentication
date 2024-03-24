@@ -5,15 +5,21 @@ const { Op } = require('sequelize');
 
 exports.arrangeCleaningDuties = async (req, res) => {
   try {
+    const alreadyAssignedDate = await checkCleaningDutiesForCurrentMonth();
     // Get the current date
     const currentDate = new Date();
 
     // Clone the current date to avoid mutation
     const cleaningDate = new Date(currentDate);
 
-    // Set to the first day of the month
-    cleaningDate.setDate(1);
-
+    // if the month already has cleaning duties, start from the last assigned date
+    if (alreadyAssignedDate == null) {
+      // Set to the first day of the month
+      cleaningDate.setDate(1);
+    } else {
+      // Set to the next day of the last assigned date
+      cleaningDate.setDate(alreadyAssignedDate.getDate() + 1);
+    }
     // Check if the first day of the month is Saturday or Sunday
     if (cleaningDate.getDay() === 6) {
       // 6 is Saturday
@@ -35,14 +41,19 @@ exports.arrangeCleaningDuties = async (req, res) => {
     let totalDays = endOfMonth.getDate();
 
     // Query the database to get all users
-    const users = await User.findAll();
+    const users = await User.findAll({
+      where: {
+        is_admin: false,
+      },
+    });
     let clonedUsers = [...users]; // Clone the array of users
 
     // Start a transaction
     await sequelize.transaction(async (t) => {
-      // Iterate over the days until the end of the month and assign cleaning duties
+      // Array to hold cleaning duties for the current and next month
       const cleaningDuties = [];
-      // Reset the cleaning day to the first day of the week
+
+      // Iterate over the days until the end of the month and assign cleaning duties
       const cleaningDay = new Date(cleaningDate);
 
       for (let i = 1; i <= totalDays; i++) {
@@ -73,13 +84,35 @@ exports.arrangeCleaningDuties = async (req, res) => {
         cleaningDay.setDate(cleaningDay.getDate() + 1);
       }
 
-      // Bulk insert cleaning duty records
-      await CleaningDuty.bulkCreate(cleaningDuties, { transaction: t });
+      // Move remaining users to the next month if any
+      if (clonedUsers.length > 0) {
+        const nextMonth = new Date(cleaningDate);
+        nextMonth.setMonth(nextMonth.getMonth() + 1);
+        nextMonth.setDate(1);
 
-      // Move to the next month
-      cleaningDate.setMonth(cleaningDate.getMonth() + 1);
-      // Reset the cleaning date to the first day of the month
-      cleaningDate.setDate(1);
+        let nextMonthDay = new Date(nextMonth);
+
+        while (nextMonthDay.getDay() === 0 || nextMonthDay.getDay() === 6) {
+          nextMonthDay.setDate(nextMonthDay.getDate() + 1);
+        }
+
+        clonedUsers.forEach((user) => {
+          cleaningDuties.push({
+            cleaner_id: user.id,
+            assign_date: new Date(nextMonthDay),
+            cleaning_date: null,
+            createdAt: new Date(),
+            updatedAt: new Date(),
+          });
+
+          do {
+            nextMonthDay.setDate(nextMonthDay.getDate() + 1);
+          } while (nextMonthDay.getDay() === 0 || nextMonthDay.getDay() === 6);
+        });
+      }
+
+      // Bulk insert all cleaning duty records
+      await CleaningDuty.bulkCreate(cleaningDuties, { transaction: t });
     });
 
     res
@@ -106,7 +139,7 @@ exports.getCleaningDuties = async (req, res) => {
       include: {
         model: User,
         as: 'cleaner',
-        attributes: ['id', 'email'],
+        attributes: ['id', 'email', 'avatar_url'],
       },
     });
 
@@ -120,3 +153,50 @@ exports.getCleaningDuties = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+async function checkCleaningDutiesForCurrentMonth() {
+  try {
+    // Get the current date
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth());
+
+    // Set to the first day of the month
+    currentDate.setDate(1);
+
+    // Check if the first day of the month is Saturday or Sunday
+    if (currentDate.getDay() === 6) {
+      // 6 is Saturday
+      // Move to Monday
+      currentDate.setDate(currentDate.getDate() + 2);
+    } else if (currentDate.getDay() === 0) {
+      // 0 is Sunday
+      // Move to Monday
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // Calculate the end of the month
+    const endOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+
+    // Query the database to check if any cleaning duties exist for the current month
+    const cleaningDuties = await CleaningDuty.findAll({
+      where: {
+        assign_date: {
+          [Op.between]: [currentDate, endOfMonth],
+        },
+      },
+    });
+
+    if (cleaningDuties.length > 0) {
+      // Get the last item in the array
+      const lastCleaningDuty = cleaningDuties[cleaningDuties.length - 1];
+      return lastCleaningDuty.assign_date;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
