@@ -28,6 +28,8 @@ const {
   deleteTokenDevice,
 } = require('../controllers/DevicesController');
 
+const { sendNotification } = require('../controllers/NotificationController');
+
 /**
  * @swagger
  * securityDefinitions:
@@ -316,5 +318,21 @@ router.post('/api/devices', savingTokenDevice);
  *         description: Internal server error
  */
 router.delete('/api/devices', deleteTokenDevice);
+
+/**
+ * @swagger
+ * /api/notifications:
+ *   post:
+ *     summary: Send notification
+ *     tags: [Notifications]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       '200':
+ *         description: Notification sent successfully
+ *       '500':
+ *         description: Internal server error
+ */
+router.post('/api/notifications', sendNotification);
 
 module.exports = router;

@@ -1,4 +1,5 @@
 const FireBase = require('../services/firebase');
+const { DeviceToken } = require('../models');
 
 exports.sendNotification = async (req, res) => {
   try {
@@ -6,17 +7,17 @@ exports.sendNotification = async (req, res) => {
 
     const deviceTokens = await DeviceToken.findAll({
       where: {
-        userId: userId,
+        user_id: userId,
       },
     });
 
     const messages = deviceTokens.map((deviceToken) => {
       return {
         notification: {
-          title: 'Notification Title',
-          body: 'Notification Body',
+          title: 'Nhắc nhở trực nhật',
+          body: 'Hôm nay là ngày trực nhật của bạn , hãy nhớ đổ rác đúng giờ nhé !',
         },
-        token: deviceToken.deviceToken,
+        token: deviceToken.device_token,
       };
     });
 
