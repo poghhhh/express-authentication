@@ -5,15 +5,21 @@ const { Op } = require('sequelize');
 
 exports.arrangeCleaningDuties = async (req, res) => {
   try {
+    const alreadyAssignedDate = await checkCleaningDutiesForCurrentMonth();
     // Get the current date
     const currentDate = new Date();
 
     // Clone the current date to avoid mutation
     const cleaningDate = new Date(currentDate);
 
-    // Set to the first day of the month
-    cleaningDate.setDate(1);
-
+    // if the month already has cleaning duties, start from the last assigned date
+    if (alreadyAssignedDate == null) {
+      // Set to the first day of the month
+      cleaningDate.setDate(1);
+    } else {
+      // Set to the next day of the last assigned date
+      cleaningDate.setDate(alreadyAssignedDate.getDate() + 1);
+    }
     // Check if the first day of the month is Saturday or Sunday
     if (cleaningDate.getDay() === 6) {
       // 6 is Saturday
@@ -80,14 +86,24 @@ exports.arrangeCleaningDuties = async (req, res) => {
         nextMonth.setMonth(nextMonth.getMonth() + 1);
         nextMonth.setDate(1);
 
+        let nextMonthDay = new Date(nextMonth);
+
+        while (nextMonthDay.getDay() === 0 || nextMonthDay.getDay() === 6) {
+          nextMonthDay.setDate(nextMonthDay.getDate() + 1);
+        }
+
         clonedUsers.forEach((user) => {
           cleaningDuties.push({
             cleaner_id: user.id,
-            assign_date: nextMonth,
+            assign_date: new Date(nextMonthDay),
             cleaning_date: null,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
+
+          do {
+            nextMonthDay.setDate(nextMonthDay.getDate() + 1);
+          } while (nextMonthDay.getDay() === 0 || nextMonthDay.getDay() === 6);
         });
       }
 
@@ -133,3 +149,50 @@ exports.getCleaningDuties = async (req, res) => {
     res.status(500).json({ message: 'Internal server error' });
   }
 };
+async function checkCleaningDutiesForCurrentMonth() {
+  try {
+    // Get the current date
+    const currentDate = new Date();
+    currentDate.setMonth(currentDate.getMonth() + 1);
+
+    // Set to the first day of the month
+    currentDate.setDate(1);
+
+    // Check if the first day of the month is Saturday or Sunday
+    if (currentDate.getDay() === 6) {
+      // 6 is Saturday
+      // Move to Monday
+      currentDate.setDate(currentDate.getDate() + 2);
+    } else if (currentDate.getDay() === 0) {
+      // 0 is Sunday
+      // Move to Monday
+      currentDate.setDate(currentDate.getDate() + 1);
+    }
+
+    // Calculate the end of the month
+    const endOfMonth = new Date(
+      currentDate.getFullYear(),
+      currentDate.getMonth() + 1,
+      0
+    );
+
+    // Query the database to check if any cleaning duties exist for the current month
+    const cleaningDuties = await CleaningDuty.findAll({
+      where: {
+        assign_date: {
+          [Op.between]: [currentDate, endOfMonth],
+        },
+      },
+    });
+
+    if (cleaningDuties.length > 0) {
+      // Get the last item in the array
+      const lastCleaningDuty = cleaningDuties[cleaningDuties.length - 1];
+      return lastCleaningDuty.assign_date;
+    } else {
+      return null;
+    }
+  } catch (error) {
+    return null;
+  }
+}
