@@ -153,7 +153,7 @@ async function checkCleaningDutiesForCurrentMonth() {
   try {
     // Get the current date
     const currentDate = new Date();
-    currentDate.setMonth(currentDate.getMonth() + 1);
+    currentDate.setMonth(currentDate.getMonth());
 
     // Set to the first day of the month
     currentDate.setDate(1);
