@@ -41,7 +41,11 @@ exports.arrangeCleaningDuties = async (req, res) => {
     let totalDays = endOfMonth.getDate();
 
     // Query the database to get all users
-    const users = await User.findAll();
+    const users = await User.findAll({
+      where: {
+        is_admin: false,
+      },
+    });
     let clonedUsers = [...users]; // Clone the array of users
 
     // Start a transaction
