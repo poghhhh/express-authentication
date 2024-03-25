@@ -2,19 +2,27 @@ const { User } = require('../models');
 const dto = require('lodash');
 const minioClient = require('../services/minio');
 const userResponseModel = require('../DTOs/usersDTOs/userResponseDTO');
+const getAllUserResponseModel = require('../DTOs/usersDTOs/getAllUserResponseDTO');
 
 // Controller to get all users
 exports.getAllUsers = async (req, res) => {
   try {
-    const users = await User.findAll();
+    const users = await User.findAll({
+      where: {
+        is_admin: false,
+      },
+    });
 
     // Map over the users array and pick only the required properties using lodash(dto)
     const filteredUsers = users.map((user) =>
-      dto.pick(user, Object.values(userResponseModel))
+      dto.pick(user, Object.values(getAllUserResponseModel))
     );
 
     // Return the filteredUsers array in the response
-    res.json(filteredUsers);
+    res.status(200).json({
+      message: 'Get all users successfully',
+      data: { User: filteredUsers },
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ message: 'Internal server error' });

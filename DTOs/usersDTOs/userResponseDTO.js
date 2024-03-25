@@ -1,4 +1,5 @@
 const userResponseModel = {
+  id: 'id',
   username: 'username',
   name: 'name',
   date_of_birth: 'date_of_birth',
