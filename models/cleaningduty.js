@@ -17,8 +17,8 @@ module.exports = (sequelize, DataTypes) => {
   CleaningDuty.init(
     {
       cleaner_id: DataTypes.INTEGER,
-      assign_date: DataTypes.DATE,
-      cleaning_date: DataTypes.DATE,
+      assign_date: DataTypes.DATEONLY,
+      cleaning_date: DataTypes.DATEONLY,
     },
     {
       sequelize,

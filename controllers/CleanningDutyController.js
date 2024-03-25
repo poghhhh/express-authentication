@@ -68,7 +68,9 @@ exports.arrangeCleaningDuties = async (req, res) => {
           clonedUsers = [...users];
         }
 
-        const cleaningDateForUser = new Date(cleaningDay);
+        const cleaningDateForUser = new Date(cleaningDay)
+          .toISOString()
+          .split('T')[0];
 
         const user = clonedUsers.shift();
 
@@ -127,8 +129,8 @@ exports.arrangeCleaningDuties = async (req, res) => {
 exports.getCleaningDuties = async (req, res) => {
   try {
     const { year, month } = req.params;
-    const startDate = new Date(year, month - 1, 1);
-    const endDate = new Date(year, month, 0);
+    const startDate = new Date(year, month - 1, 1).toISOString().split('T')[0];
+    const endDate = new Date(year, month, 0).toISOString().split('T')[0];
 
     const cleaningDuties = await CleaningDuty.findAll({
       where: {

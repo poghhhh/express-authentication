@@ -18,10 +18,10 @@ module.exports = {
         onDelete: 'CASCADE', // Optional: What to do on deletes
       },
       assign_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       cleaning_date: {
-        type: Sequelize.DATE,
+        type: Sequelize.DATEONLY,
       },
       createdAt: {
         allowNull: false,
