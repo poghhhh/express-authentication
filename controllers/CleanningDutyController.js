@@ -2,6 +2,7 @@ const { CleaningDuty, User, sequelize } = require('../models');
 const dto = require('lodash');
 const CleaningDutiesResponseDTO = require('../DTOs/cleaningDutiesDTOs/cleaningDutiesResponseDTO');
 const { Op } = require('sequelize');
+const moment = require('moment-timezone');
 
 exports.arrangeCleaningDuties = async (req, res) => {
   try {
@@ -19,8 +20,7 @@ exports.arrangeCleaningDuties = async (req, res) => {
     } else {
       alreadyAssignedDate = new Date(alreadyAssignedDate);
       cleaningDate = alreadyAssignedDate;
-      // Set to the next day of the last assigned date
-      cleaningDate.setDate(alreadyAssignedDate.getDate() + 1);
+      cleaningDate.setDate(alreadyAssignedDate.getDate());
     }
 
     // Calculate the end of the month
@@ -34,6 +34,7 @@ exports.arrangeCleaningDuties = async (req, res) => {
 
     if (alreadyAssignedDate != null) {
       totalDays = totalDays - alreadyAssignedDate.getDate();
+      cleaningDate.setDate(alreadyAssignedDate.getDate() + 1);
     }
 
     // Query the database to get all users
@@ -83,9 +84,10 @@ exports.arrangeCleaningDuties = async (req, res) => {
       if (clonedUsers.length > 0) {
         const nextMonth = new Date();
         if (alreadyAssignedDate !== null) {
-          nextMonth.setMonth(alreadyAssignedDate.getMonth() + 1);
+          nextMonth.setMonth(alreadyAssignedDate.getMonth());
+        } else {
+          nextMonth.setMonth(nextMonth.getMonth() + 1);
         }
-        nextMonth.setMonth(nextMonth.getMonth() + 1);
         nextMonth.setDate(1);
 
         let nextMonthDay = new Date(nextMonth);
@@ -125,13 +127,16 @@ exports.arrangeCleaningDuties = async (req, res) => {
 exports.getCleaningDuties = async (req, res) => {
   try {
     const { year, month } = req.params;
-    const startDate = new Date(year, month - 1, 1).toISOString().split('T')[0];
-    const endDate = new Date(year, month, 0).toISOString().split('T')[0];
+    let newDate = new Date(year, month - 1);
+    newDate = moment(newDate).format('YYYY-MM-DD');
+
+    // Calculate the end date dynamically based on the month
+    const endDate = moment(newDate).endOf('month').format('YYYY-MM-DD');
 
     const cleaningDuties = await CleaningDuty.findAll({
       where: {
         assign_date: {
-          [Op.between]: [startDate, endDate],
+          [Op.between]: [newDate, endDate],
         },
       },
       include: {
