@@ -4,7 +4,6 @@ const { swaggerUi, specs } = require('./swaggerConfig');
 const minioClient = require('./services/minio');
 const { verifyToken, jsonParser } = require('./middleware');
 require('./services/schedule');
-
 const app = express();
 
 // Middleware
