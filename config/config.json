@@ -1,23 +1,28 @@
 {
   "development": {
-    "username": "root",
-    "password": "12345678",
-    "database": "CleanningDutyDatabase",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
-  },
-  "test": {
-    "username": "root",
-    "password": null,
-    "database": "database_test",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres",
+    "host": "ep-long-sea-a1t9f4t3-pooler.ap-southeast-1.aws.neon.tech",
+    "username": "default",
+    "password": "9Nsmvfcj2Khb",
+    "database": "verceldb",
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true
+      }
+    }
   },
   "production": {
-    "username": "root",
-    "password": null,
-    "database": "database_production",
-    "host": "127.0.0.1",
-    "dialect": "mysql"
+    "dialect": "postgres",
+    "host": "ep-long-sea-a1t9f4t3-pooler.ap-southeast-1.aws.neon.tech",
+    "username": "default",
+    "password": "9Nsmvfcj2Khb",
+    "database": "verceldb",
+    "ssl": true,
+    "dialectOptions": {
+      "ssl": {
+        "require": true
+      }
+    }
   }
 }
