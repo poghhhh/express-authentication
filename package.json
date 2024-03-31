@@ -22,6 +22,7 @@
     "jsonwebtoken": "^9.0.2",
     "lodash": "^4.17.21",
     "minio": "^7.1.3",
+    "moment-timezone": "^0.5.45",
     "node-schedule": "^2.1.1",
     "pg": "^8.11.4",
     "sequelize": "^6.37.1",
