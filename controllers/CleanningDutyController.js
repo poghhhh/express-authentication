@@ -157,6 +157,29 @@ exports.getCleaningDuties = async (req, res) => {
   }
 };
 
+exports.marksAsDone = async (req, res) => {
+  try {
+    const { cleaningDutyId } = req.params;
+    const userId = req.app.locals.current_user.id;
+    const cleaningDuty = await CleaningDuty.findByPk(cleaningDutyId);
+    if (userId !== cleaningDuty.cleaner_id) {
+      return res.status(401).json({ message: 'User is invalid' });
+    }
+
+    if (!cleaningDuty) {
+      return res.status(404).json({ message: 'Cleaning duty not found' });
+    }
+
+    cleaningDuty.cleaning_date = new Date();
+    await cleaningDuty.save();
+
+    res.status(200).json({ message: 'Cleaning duty marked as done' });
+  } catch (error) {
+    console.error('Error marking cleaning duty as done:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 async function checkCleaningDutiesForCurrentMonth() {
   try {
     // Get the current date
